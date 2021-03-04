@@ -41,7 +41,7 @@ const ColorRed = "\033[31m"
 const ColorYellow = "\033[33m"
 
 func main() {
-	bksdk := bitkubsdk.NewBitkub("48d89b07c3d88ef225e156c5beb6654b", "10fba6fc4a893aec98bb8e52e0b435b2")
+	bksdk := bitkubsdk.NewBitkub("xxx", "xxx")
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	bksdk.WatchTicker(ctx, func(conn *websocket.Conn) {
