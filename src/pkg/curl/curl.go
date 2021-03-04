@@ -7,7 +7,18 @@ import (
 	"net/http"
 )
 
-func HttpGet(url string, out interface{}) (statusCode int, err error) {
+type IRequester interface {
+	Get(url string, out interface{}) (statusCode int, err error)
+	GetRaw(url string) (raw []byte, statusCode int, err error)
+}
+
+type Requester struct{}
+
+func NewRequester() IRequester {
+	return &Requester{}
+}
+
+func (r *Requester) Get(url string, out interface{}) (statusCode int, err error) {
 	resp, err := http.Get(url)
 
 	// Error checking of the http.Get() request
@@ -39,7 +50,7 @@ func HttpGet(url string, out interface{}) (statusCode int, err error) {
 	return resp.StatusCode, nil
 }
 
-func HttpGetRaw(url string) (raw []byte, statusCode int, err error) {
+func (r *Requester) GetRaw(url string) (raw []byte, statusCode int, err error) {
 	resp, err := http.Get(url)
 
 	// Error checking of the http.Get() request

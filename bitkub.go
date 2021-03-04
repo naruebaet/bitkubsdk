@@ -16,6 +16,7 @@ const ApiHost = "https://api.bitkub.com"
 type BitkubAccess struct {
 	ApiKey    string
 	ApiSecret string
+	Req       curl.IRequester
 }
 
 type BitkubRepository interface {
@@ -68,12 +69,13 @@ func NewBitkub(apiKey string, apiSecret string) BitkubRepository {
 	bk = &BitkubAccess{
 		ApiKey:    apiKey,
 		ApiSecret: apiSecret,
+		Req:       curl.NewRequester(),
 	}
 	return bk
 }
 
 func (bk *BitkubAccess) GetServerStatus() (response []model.ServerStatusResponse, err error) {
-	statusCode, err := curl.HttpGet(ApiHost+"/api/status", &response)
+	statusCode, err := bk.Req.Get(ApiHost+"/api/status", &response)
 	if err != nil || statusCode != http.StatusOK {
 		return nil, err
 	}
@@ -82,7 +84,7 @@ func (bk *BitkubAccess) GetServerStatus() (response []model.ServerStatusResponse
 }
 
 func (bk *BitkubAccess) GetServerTime() (response string, err error) {
-	raw, statusCode, err := curl.HttpGetRaw(ApiHost + "/api/servertime")
+	raw, statusCode, err := bk.Req.GetRaw(ApiHost + "/api/servertime")
 	if err != nil || statusCode != http.StatusOK {
 		return "", err
 	}
@@ -93,7 +95,7 @@ func (bk *BitkubAccess) GetServerTime() (response string, err error) {
 }
 
 func (bk *BitkubAccess) GetSymbols() (response model.SymbolResponse, err error) {
-	statusCode, err := curl.HttpGet(ApiHost+"/api/market/symbols", &response)
+	statusCode, err := bk.Req.Get(ApiHost+"/api/market/symbols", &response)
 	if err != nil || statusCode != http.StatusOK {
 		return model.SymbolResponse{}, err
 	}
@@ -102,7 +104,7 @@ func (bk *BitkubAccess) GetSymbols() (response model.SymbolResponse, err error) 
 }
 
 func (bk *BitkubAccess) GetTicker(sym string) (response map[string]model.TickerResponseResult, err error) {
-	statusCode, err := curl.HttpGet(ApiHost+"/api/market/ticker?sym="+sym, &response)
+	statusCode, err := bk.Req.Get(ApiHost+"/api/market/ticker?sym="+sym, &response)
 	if err != nil || statusCode != http.StatusOK {
 		return map[string]model.TickerResponseResult{}, err
 	}
@@ -111,7 +113,7 @@ func (bk *BitkubAccess) GetTicker(sym string) (response map[string]model.TickerR
 }
 
 func (bk *BitkubAccess) GetTrades(sym string, lmt int) (response model.TradeResponse, err error) {
-	statusCode, err := curl.HttpGet(fmt.Sprintf("%s/api/market/trades?sym=%s&lmt=%d", ApiHost, sym, lmt), &response)
+	statusCode, err := bk.Req.Get(fmt.Sprintf("%s/api/market/trades?sym=%s&lmt=%d", ApiHost, sym, lmt), &response)
 	if err != nil || statusCode != http.StatusOK {
 		return model.TradeResponse{}, err
 	}
@@ -120,7 +122,7 @@ func (bk *BitkubAccess) GetTrades(sym string, lmt int) (response model.TradeResp
 }
 
 func (bk *BitkubAccess) GetBids(sym string, lmt int) (response model.BidsAskResponse, err error) {
-	statusCode, err := curl.HttpGet(fmt.Sprintf("%s/api/market/bids?sym=%s&lmt=%d", ApiHost, sym, lmt), &response)
+	statusCode, err := bk.Req.Get(fmt.Sprintf("%s/api/market/bids?sym=%s&lmt=%d", ApiHost, sym, lmt), &response)
 	if err != nil || statusCode != http.StatusOK {
 		return model.BidsAskResponse{}, err
 	}
@@ -129,7 +131,7 @@ func (bk *BitkubAccess) GetBids(sym string, lmt int) (response model.BidsAskResp
 }
 
 func (bk *BitkubAccess) GetAsks(sym string, lmt int) (response model.BidsAskResponse, err error) {
-	statusCode, err := curl.HttpGet(fmt.Sprintf("%s/api/market/asks?sym=%s&lmt=%d", ApiHost, sym, lmt), &response)
+	statusCode, err := bk.Req.Get(fmt.Sprintf("%s/api/market/asks?sym=%s&lmt=%d", ApiHost, sym, lmt), &response)
 	if err != nil || statusCode != http.StatusOK {
 		return model.BidsAskResponse{}, err
 	}
@@ -138,7 +140,7 @@ func (bk *BitkubAccess) GetAsks(sym string, lmt int) (response model.BidsAskResp
 }
 
 func (bk *BitkubAccess) GetBooks(sym string, lmt int) (response model.BooksResponse, err error) {
-	statusCode, err := curl.HttpGet(fmt.Sprintf("%s/api/market/books?sym=%s&lmt=%d", ApiHost, sym, lmt), &response)
+	statusCode, err := bk.Req.Get(fmt.Sprintf("%s/api/market/books?sym=%s&lmt=%d", ApiHost, sym, lmt), &response)
 	if err != nil || statusCode != http.StatusOK {
 		return model.BooksResponse{}, err
 	}
@@ -148,7 +150,7 @@ func (bk *BitkubAccess) GetBooks(sym string, lmt int) (response model.BooksRespo
 
 func (bk *BitkubAccess) GetTradingview(sym string, interval, frm, lmt int) (response model.TradingviewResponse, err error) {
 	query := fmt.Sprintf("?sym=%s&int=%d&frm=%d&lmt=%d", sym, interval, frm, lmt)
-	statusCode, err := curl.HttpGet(ApiHost+"/api/market/tradingview"+query, &response)
+	statusCode, err := bk.Req.Get(ApiHost+"/api/market/tradingview"+query, &response)
 	if err != nil || statusCode != http.StatusOK {
 		return model.TradingviewResponse{}, err
 	}
@@ -157,7 +159,7 @@ func (bk *BitkubAccess) GetTradingview(sym string, interval, frm, lmt int) (resp
 }
 
 func (bk *BitkubAccess) GetDepth(sym string, lmt int) (response model.BooksResponse, err error) {
-	statusCode, err := curl.HttpGet(fmt.Sprintf("%s/api/market/depth?sym=%s&lmt=%d", ApiHost, sym, lmt), &response)
+	statusCode, err := bk.Req.Get(fmt.Sprintf("%s/api/market/depth?sym=%s&lmt=%d", ApiHost, sym, lmt), &response)
 	if err != nil || statusCode != http.StatusOK {
 		return model.BooksResponse{}, err
 	}
