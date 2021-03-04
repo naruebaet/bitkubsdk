@@ -58,3 +58,19 @@ func main() {
 	})
 }
 ```
+
+## public function
+- GetServerStatus
+- GetServerTime
+- GetSymbols
+- GetTicker
+- GetTrades
+- GetBids
+- GetAsks
+- GetBooks
+- GetTradingview
+- GetDepth
+
+## websocket function
+- WatchTicker
+- WatchTrade
