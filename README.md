@@ -74,3 +74,6 @@ func main() {
 ## websocket function
 - WatchTicker
 - WatchTrade
+
+## buy me a coffee
+![buymeacoffee](./static/naruebaet_buy_me_a_coffee.jpeg "buy me a coffee")
